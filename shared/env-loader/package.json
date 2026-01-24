@@ -1,0 +1,10 @@
+{
+  "name": "@shared/env-loader",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "module",
+  "description": "Smart environment loader for monorepo (loads root + service env)",
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

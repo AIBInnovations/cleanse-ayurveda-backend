@@ -1,0 +1,15 @@
+{
+  "name": "@shared/config",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "Shared configuration for all microservices",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "cloudinary": "^2.8.0",
+    "firebase-admin": "^13.6.0"
+  },
+  "type": "module"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@shared/providers",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "Shared service providers",
+  "dependencies": {
+    "cloudinary": "^2.8.0",
+    "@shared/config": "workspace:*"
+  },
+  "type": "module"
+}

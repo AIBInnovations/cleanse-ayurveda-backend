@@ -1,0 +1,12 @@
+{
+  "name": "@shared/middlewares",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "Shared middleware functions",
+  "dependencies": {
+    "joi": "^18.0.2",
+    "multer": "^2.0.2",
+    "@shared/utils": "workspace:*"
+  },
+  "type": "module"
+}

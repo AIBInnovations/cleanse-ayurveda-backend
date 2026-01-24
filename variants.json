@@ -1,0 +1,32 @@
+[
+  {
+    "name": "100ml",
+    "sku": "GHHO-001-100ML",
+    "variantType": "size",
+    "mrp": 299,
+    "salePrice": 249,
+    "weight": 120,
+    "isDefault": true,
+    "sortOrder": 0
+  },
+  {
+    "name": "200ml",
+    "sku": "GHHO-001-200ML",
+    "variantType": "size",
+    "mrp": 499,
+    "salePrice": 399,
+    "weight": 220,
+    "isDefault": false,
+    "sortOrder": 1
+  },
+  {
+    "name": "500ml",
+    "sku": "GHHO-001-500ML",
+    "variantType": "size",
+    "mrp": 999,
+    "salePrice": 799,
+    "weight": 520,
+    "isDefault": false,
+    "sortOrder": 2
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "name": "@shared/auth-middleware",
+  "version": "1.0.0",
+  "description": "Shared authentication middleware for all microservices",
+  "main": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3",
+    "@shared/utils": "workspace:*"
+  }
+}

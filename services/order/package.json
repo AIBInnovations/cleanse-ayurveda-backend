@@ -1,0 +1,33 @@
+{
+  "name": "order-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@shared/config": "workspace:*",
+    "@shared/utils": "workspace:*",
+    "@shared/providers": "workspace:*",
+    "@shared/middlewares": "workspace:*",
+    "@shared/auth-middleware": "workspace:*",
+    "@shared/error-handler": "workspace:*",
+    "@shared/circuit-breaker": "workspace:*",
+    "@shared/http-client": "workspace:*",
+    "@shared/cloudinary": "workspace:*",
+    "@shared/env-loader": "workspace:*",
+    "axios": "^1.7.9",
+    "node-cron": "^3.0.3",
+    "pdfkit": "^0.15.0",
+    "razorpay": "^2.9.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "cleanser-monorepo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Cleanser microservices monorepo",
+  "scripts": {
+    "kill-ports": "node scripts/kill-ports.js",
+    "start:all": "pnpm -r run start",
+    "dev:all": "node scripts/kill-ports.js && pnpm -r --parallel dev",
+    "start:gateway": "pnpm --filter gateway-service start",
+    "dev:gateway": "pnpm --filter gateway-service dev",
+    "start:auth": "pnpm --filter auth-service start",
+    "dev:auth": "pnpm --filter auth-service dev",
+    "start:catalog": "pnpm --filter catalog-service start",
+    "dev:catalog": "pnpm --filter catalog-service dev",
+    "start:order": "pnpm --filter order-service start",
+    "dev:order": "pnpm --filter order-service dev",
+    "start:inventory": "pnpm --filter inventory-service start",
+    "dev:inventory": "pnpm --filter inventory-service dev",
+    "start:pricing": "pnpm --filter pricing-promotions-service start",
+    "dev:pricing": "pnpm --filter pricing-promotions-service dev",
+    "seed:auth": "pnpm --filter auth-service seed",
+    "seed:catalog": "pnpm --filter catalog-service seed",
+    "test:all": "pnpm -r run test",
+    "test:catalog": "pnpm --filter catalog-service test",
+    "health:check": "curl -s http://localhost:3000/api/health && curl -s http://localhost:3001/api/health && curl -s http://localhost:3002/api/health && curl -s http://localhost:3003/api/health && curl -s http://localhost:3004/api/health && curl -s http://localhost:3005/api/health",
+    "install:all": "pnpm install",
+    "clean": "pnpm -r exec rm -rf node_modules && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.0.2",
+    "mongodb": "^7.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "joi": "^18.0.2",
+    "multer": "^2.0.2",
+    "cloudinary": "^2.8.0",
+    "firebase-admin": "^13.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

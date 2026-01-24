@@ -1,0 +1,13 @@
+{
+  "name": "@shared/cloudinary",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "Shared Cloudinary upload endpoints",
+  "dependencies": {
+    "express": "^5.2.1",
+    "@shared/utils": "workspace:*",
+    "@shared/providers": "workspace:*",
+    "@shared/middlewares": "workspace:*"
+  },
+  "type": "module"
+}

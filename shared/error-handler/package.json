@@ -1,0 +1,14 @@
+{
+  "name": "@shared/error-handler",
+  "version": "1.0.0",
+  "description": "Shared error handling middleware for all microservices",
+  "main": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@shared/utils": "workspace:*",
+    "uuid": "^11.0.5"
+  }
+}

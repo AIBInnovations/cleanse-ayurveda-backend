@@ -1,0 +1,11 @@
+{
+  "name": "@shared/circuit-breaker",
+  "version": "1.0.0",
+  "description": "Circuit breaker pattern for resilient service-to-service communication",
+  "main": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {}
+}
