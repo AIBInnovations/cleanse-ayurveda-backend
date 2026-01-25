@@ -1,12 +1,12 @@
-//
+// ============================================================================
 // CLEANSE AYURVEDA - DATA MODEL (SIMPLIFIED)
 // E-commerce Platform | MERN + AWS | 8 Microservices
 // ~70 Entities | All Relationships Defined
-//
+// ============================================================================
 
-//
+// ============================================================================
 // SERVICE 1: USER & AUTH SERVICE (Blue)
-//
+// ============================================================================
 
 users [icon: user, color: blue] {
 id string pk
@@ -106,23 +106,17 @@ ip_address string
 created_at timestamp
 }
 
-//
+// ============================================================================
 // SERVICE 2: CATALOG SERVICE (Purple)
-//
+// ============================================================================
 
 brands [icon: award, color: purple] {
 id string pk
 slug string unique
 name string
-description string
-logo {
-  url string
-  public_id string
-}
+logo_url string
 is_active boolean
-deleted_at timestamp
 created_at timestamp
-updated_at timestamp
 }
 
 ingredients [icon: droplet, color: purple] {
@@ -131,15 +125,10 @@ slug string unique
 name string
 scientific_name string
 description text
-benefits json // Array of benefit strings
-image {
-  url string
-  public_id string
-}
+benefits text
+image_url string
 is_active boolean
-deleted_at timestamp
 created_at timestamp
-updated_at timestamp
 }
 
 products [icon: package, color: purple] {
@@ -149,23 +138,22 @@ slug string unique
 name string
 short_description string
 description text
-benefits json // Array of benefit strings
+benefits text
 how_to_use text
 product_type string // simple, variable, bundle
 brand_id string
 status string // draft, active, archived
 is_featured boolean
 is_bestseller boolean
-is_new_arrival boolean
 is_taxable boolean
 hsn_code string
 weight decimal
 tags json
-attributes json // {skin_type: [], concerns: []}
+attributes json // {skin_type, concern}
 seo json // {title, description, keywords}
-rating_summary json // {average: decimal, count: int}
+avg_rating decimal
+review_count int
 created_by_id string
-deleted_at timestamp
 created_at timestamp
 updated_at timestamp
 }
@@ -175,20 +163,16 @@ id string pk
 product_id string
 sku string unique
 name string
-variant_type string // Simplified: "100ml", "50ml" (for single option)
-option_values json // Complex: {size: "100ml", flavor: "mint"} (for multi-option)
+option_values json // {size: "100ml"}
 mrp decimal
 sale_price decimal
 cost_price decimal
-discount_percent decimal
 weight decimal
 barcode string
 is_default boolean
-is_active boolean // Or status enum if multiple states needed
+status string // active, inactive
 sort_order int
-deleted_at timestamp
 created_at timestamp
-updated_at timestamp
 }
 
 product_media [icon: image, color: purple] {
@@ -197,15 +181,11 @@ product_id string
 variant_id string
 type string // image, video
 url string
-public_id string
 thumbnail_url string
 alt_text string
 is_primary boolean
 sort_order int
-metadata json // {width, height, format, bytes}
-deleted_at timestamp
 created_at timestamp
-updated_at timestamp
 }
 
 product_ingredients [icon: link, color: purple] {
@@ -215,8 +195,6 @@ ingredient_id string
 percentage decimal
 is_key_ingredient boolean
 sort_order int
-created_at timestamp
-updated_at timestamp
 }
 
 categories [icon: folder, color: purple] {
@@ -225,23 +203,12 @@ parent_id string
 slug string unique
 name string
 description text
-level int // Hierarchy depth (0 for root)
-path string // Materialized path for tree queries
-image {
-  url string
-  public_id string
-}
-banner {
-  url string
-  public_id string
-}
+image_url string
 is_active boolean
 show_in_menu boolean
 seo json
 sort_order int
-deleted_at timestamp
 created_at timestamp
-updated_at timestamp
 }
 
 product_categories [icon: link, color: purple] {
@@ -249,8 +216,6 @@ id string pk
 product_id string
 category_id string
 is_primary boolean
-created_at timestamp
-updated_at timestamp
 }
 
 collections [icon: grid, color: purple] {
@@ -259,22 +224,13 @@ slug string unique
 name string
 description text
 type string // manual, smart
-rules json // Array of rule objects: [{field, operator, value}]
-rules_match string // all, any (for smart collections)
-image {
-  url string
-  public_id string
-}
-banner {
-  url string
-  public_id string
-}
+rules json
+image_url string
 is_active boolean
 is_featured boolean
 seo json
 sort_order int
 created_by_id string
-deleted_at timestamp
 created_at timestamp
 updated_at timestamp
 }
@@ -284,33 +240,20 @@ id string pk
 collection_id string
 product_id string
 sort_order int
-created_at timestamp
-updated_at timestamp
 }
 
 bundles [icon: gift, color: purple] {
 id string pk
-product_id string // Optional: Link to product if bundle is product-based
-slug string unique
+product_id string
 name string
-description string
-image {
-  url string
-  public_id string
-}
 pricing_type string // fixed_price, percentage_off
-fixed_price decimal // When pricing_type = fixed_price
-percentage_off decimal // When pricing_type = percentage_off
-original_price decimal // Calculated: sum of item prices
-final_price decimal // Calculated: based on pricing_type
-savings decimal // Calculated: original_price - final_price
+bundle_price decimal
+discount_percentage decimal
 is_active boolean
 start_date timestamp
 end_date timestamp
 created_by_id string
-deleted_at timestamp
 created_at timestamp
-updated_at timestamp
 }
 
 bundle_items [icon: package, color: purple] {
@@ -320,8 +263,6 @@ product_id string
 variant_id string
 quantity int
 sort_order int
-created_at timestamp
-updated_at timestamp
 }
 
 related_products [icon: git-merge, color: purple] {
@@ -330,13 +271,11 @@ product_id string
 related_product_id string
 relation_type string // cross_sell, upsell, frequently_bought
 sort_order int
-created_at timestamp
-updated_at timestamp
 }
 
-//
+// ============================================================================
 // SERVICE 3: PRICING & PROMOTIONS SERVICE (Orange)
-//
+// ============================================================================
 
 coupons [icon: percent, color: orange] {
 id string pk
@@ -417,9 +356,9 @@ created_by_id string
 created_at timestamp
 }
 
-//
+// ============================================================================
 // SERVICE 4: INVENTORY SERVICE (Red)
-//
+// ============================================================================
 
 warehouses [icon: home, color: red] {
 id string pk
@@ -472,9 +411,9 @@ adjusted_by_id string
 created_at timestamp
 }
 
-//
+// ============================================================================
 // SERVICE 5: ORDER & PAYMENT SERVICE (Green)
-//
+// ============================================================================
 
 carts [icon: shopping-cart, color: green] {
 id string pk
@@ -684,9 +623,9 @@ created_by_id string
 created_at timestamp
 }
 
-//
+// ============================================================================
 // SERVICE 6: SHIPPING SERVICE (Yellow)
-//
+// ============================================================================
 
 shipping_zones [icon: map, color: yellow] {
 id string pk
@@ -773,9 +712,9 @@ variant_id string
 quantity int
 }
 
-//
+// ============================================================================
 // SERVICE 7: CONTENT & CMS SERVICE (Pink)
-//
+// ============================================================================
 
 pages [icon: file-text, color: pink] {
 id string pk
@@ -894,9 +833,54 @@ uploaded_by_id string
 created_at timestamp
 }
 
-//
+reels [icon: video, color: pink] {
+id string pk
+title string
+description string
+video_url string
+thumbnail_url string
+duration int // in seconds
+is_active boolean
+sort_order int
+view_count int
+created_by_id string
+created_at timestamp
+updated_at timestamp
+}
+
+testimonials [icon: message-circle, color: pink] {
+id string pk
+customer_name string
+customer_photo_url string
+testimonial_text text
+rating int // 1-5
+before_photo_url string
+after_photo_url string
+product_id string // optional: link to specific product
+is_verified_purchase boolean
+is_featured boolean
+is_active boolean
+sort_order int
+created_by_id string
+created_at timestamp
+updated_at timestamp
+}
+
+brand_values [icon: target, color: pink] {
+id string pk
+type string // vision, mission, value
+title string
+description text
+icon_url string
+is_active boolean
+sort_order int
+created_by_id string
+created_at timestamp
+updated_at timestamp
+}
+// ============================================================================
 // SERVICE 8: ENGAGEMENT SERVICE (Teal)
-//
+// ============================================================================
 
 reviews [icon: star, color: teal] {
 id string pk
@@ -1051,9 +1035,9 @@ sent_at timestamp
 created_at timestamp
 }
 
-//
+// ============================================================================
 // SYSTEM CONFIG (Gray)
-//
+// ============================================================================
 
 settings [icon: settings, color: gray] {
 id string pk
@@ -1109,9 +1093,9 @@ device_info json
 created_at timestamp
 }
 
-//
+// ============================================================================
 // RELATIONSHIPS
-//
+// ============================================================================
 
 // User & Auth
 addresses.user_id > users.id
@@ -1215,6 +1199,10 @@ blogs.category_id > blog_categories.id
 banners.created_by_id > admin_users.id
 popups.created_by_id > admin_users.id
 media_library.uploaded_by_id > admin_users.id
+reels.created_by_id > admin_users.id
+testimonials.product_id > products.id
+testimonials.created_by_id > admin_users.id
+brand_values.created_by_id > admin_users.id
 
 // Engagement
 reviews.product_id > products.id

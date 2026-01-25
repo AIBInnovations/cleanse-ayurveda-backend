@@ -17,6 +17,24 @@ const createServiceProxy = (targetUrl, servicePath) => {
       return "/api" + path;
     },
     onProxyReq: (proxyReq, req) => {
+      // Enhanced debug logging
+      console.log("DEBUG onProxyReq:", {
+        method: req.method,
+        path: req.path,
+        userId: req.userId,
+        guestId: req.guestId,
+        userType: req.userType,
+        hasBody: !!req.body,
+        hasAuthHeader: !!req.headers.authorization,
+        hasAccessToken: !!req.accessToken,
+        headers: {
+          'x-user-id': req.userId,
+          'x-guest-id': req.guestId,
+          'x-user-type': req.userType,
+          'authorization': req.accessToken ? `Bearer ${req.accessToken.substring(0, 20)}...` : null
+        }
+      });
+
       // Forward correlation ID
       if (req.correlationId) {
         proxyReq.setHeader("x-correlation-id", req.correlationId);
@@ -42,6 +60,18 @@ const createServiceProxy = (targetUrl, servicePath) => {
         proxyReq.setHeader("x-session-id", req.sessionId);
       }
 
+      // Forward Authorization header for services that validate JWT directly
+      // Some services use @shared/auth-middleware which expects the Authorization header
+      if (req.accessToken) {
+        proxyReq.setHeader("Authorization", `Bearer ${req.accessToken}`);
+      } else if (req.headers.authorization) {
+        // Fallback to original header if accessToken not set (e.g., for public routes)
+        proxyReq.setHeader("Authorization", req.headers.authorization);
+      }
+
+      // Note: No body reconstruction needed since gateway doesn't parse request bodies
+      // The proxy middleware transparently forwards the raw request body to backend services
+
       // Log proxied request
       console.log(
         JSON.stringify({
@@ -51,7 +81,11 @@ const createServiceProxy = (targetUrl, servicePath) => {
           method: req.method,
           path: req.path,
           target: targetUrl,
-          sessionId: req.sessionId || null,
+          headers: {
+            userId: req.userId || null,
+            guestId: req.guestId || null,
+            userType: req.userType || null,
+          },
         })
       );
     },

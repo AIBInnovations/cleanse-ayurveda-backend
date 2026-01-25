@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 import Session from "../models/session.model.js";
 import { generateAccessToken, generateRefreshToken, calculateExpiryDate } from "./token.service.js";
 
@@ -12,7 +12,7 @@ const GUEST_TOKEN_EXPIRY = "72h"; // 72 hours matching cart expiry
 export const createGuestSession = async (deviceInfo) => {
   try {
     // Generate unique guest ID
-    const guestId = uuidv4();
+    const guestId = crypto.randomUUID();
 
     // Generate tokens with guest user type
     const accessToken = generateAccessToken({

@@ -1,0 +1,27 @@
+{
+  "name": "cms-service",
+  "version": "1.0.0",
+  "description": "Content Management Service for static pages, blogs, banners, popups, navigation, FAQs, and media library",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@shared/config": "workspace:*",
+    "@shared/utils": "workspace:*",
+    "@shared/providers": "workspace:*",
+    "@shared/middlewares": "workspace:*",
+    "@shared/auth-middleware": "workspace:*",
+    "@shared/error-handler": "workspace:*",
+    "@shared/cloudinary": "workspace:*",
+    "@shared/env-loader": "workspace:*"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

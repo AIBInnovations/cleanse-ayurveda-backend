@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { sendResponse } from "@shared/utils";
 import { route as uploadRoutes } from "@shared/cloudinary";
 import authRoutes from "./src/auth/user.route.js";
+import guestRoutes from "./src/auth/guest.route.js";
 import adminAuthRoutes from "./src/auth/admin.route.js";
 import sessionRoutes from "./src/session/session.route.js";
 import profileRoutes from "./src/profile/profile.route.js";
@@ -85,6 +86,14 @@ router.use("/upload", uploadRoutes);
  * Routes: /api/register, /api/login/otp, /api/login/password, etc.
  */
 router.use("/", authRoutes);
+
+/**
+ * @route /api/guest/*
+ * Guest session routes (create session, refresh, phone verification)
+ * Gateway proxies /api/auth/guest/* to /api/guest/* in this service
+ * Routes: /api/guest, /api/guest/refresh, /api/guest/verify-phone, etc.
+ */
+router.use("/guest", guestRoutes);
 
 /**
  * @route /api/admin/* (admin auth routes at root level for consistency)

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import { sendResponse } from "@shared/utils";
-import { HTTP_STATUS, PUBLIC_ROUTES, ADMIN_ROUTES } from "../utils/constants.js";
+import { HTTP_STATUS, PUBLIC_ROUTES, ADMIN_ROUTES, OPTIONAL_AUTH_ROUTES } from "../utils/constants.js";
 
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || "http://localhost:3001";
 const SESSION_VALIDATION_ENABLED = process.env.SESSION_VALIDATION_ENABLED !== "false"; // Enable by default
@@ -52,6 +52,13 @@ const isAdminRoute = (path) => {
 };
 
 /**
+ * Check if route uses optional authentication
+ */
+const isOptionalAuthRoute = (path) => {
+  return OPTIONAL_AUTH_ROUTES.some((route) => path.startsWith(route));
+};
+
+/**
  * Gateway authentication middleware
  * Validates JWT tokens and enforces authentication requirements
  */
@@ -64,6 +71,11 @@ export const gatewayAuth = async (req, res, next) => {
   // Check if route is public
   if (isPublicRoute(req.path)) {
     return next();
+  }
+
+  // Check if route uses optional authentication
+  if (isOptionalAuthRoute(req.path)) {
+    return optionalAuth(req, res, next);
   }
 
   // Extract and verify token
@@ -297,60 +309,17 @@ export const optionalAuth = async (req, res, next) => {
     return next();
   }
 
-  // Validate session with auth service
-  if (SESSION_VALIDATION_ENABLED) {
-    try {
-      const sessionValidation = await axios.get(
-        `${AUTH_SERVICE_URL}/api/session/validate`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "x-correlation-id": req.correlationId
-          },
-          timeout: 3000
-        }
-      );
-
-      const validationData = sessionValidation.data?.data;
-
-      if (!validationData || !validationData.isActive) {
-        console.log(
-          JSON.stringify({
-            timestamp: new Date().toISOString(),
-            correlationId: req.correlationId,
-            event: "OPTIONAL_AUTH_FAILED",
-            reason: "SESSION_INACTIVE",
-            details: validationData?.reason,
-            path: req.path,
-          })
-        );
-
-        req.userId = null;
-        req.guestId = null;
-        req.userType = null;
-        req.accessToken = null;
-        return next();
-      }
-
-      req.sessionId = validationData.sessionId;
-    } catch (error) {
-      console.log(
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          correlationId: req.correlationId,
-          event: "OPTIONAL_AUTH_VALIDATION_ERROR",
-          error: error.message,
-          path: req.path,
-        })
-      );
-
-      req.userId = null;
-      req.guestId = null;
-      req.userType = null;
-      req.accessToken = null;
-      return next();
-    }
-  }
+  // For optional auth, skip session validation and use JWT data directly
+  // Session validation is optional - we trust the JWT signature
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      correlationId: req.correlationId,
+      event: "OPTIONAL_AUTH_SKIPPING_SESSION_VALIDATION",
+      userType: decoded.userType,
+      path: req.path,
+    })
+  );
 
   // Attach user info based on type
   req.userType = decoded.userType;

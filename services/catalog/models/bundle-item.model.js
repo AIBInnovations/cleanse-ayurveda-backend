@@ -33,6 +33,7 @@ const bundleItemSchema = new mongoose.Schema(
 
 bundleItemSchema.index({ bundle: 1, sortOrder: 1 });
 bundleItemSchema.index({ bundle: 1, product: 1 });
+bundleItemSchema.index({ product: 1 }); // For efficient lookup of bundles containing a product
 
 const BundleItem = mongoose.model("BundleItem", bundleItemSchema);
 

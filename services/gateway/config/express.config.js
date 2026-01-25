@@ -22,6 +22,10 @@ const createApp = () => {
     })
   );
 
+  // Note: Body parsing is intentionally NOT used here
+  // The gateway should transparently forward request bodies to backend services
+  // Each backend service handles its own body parsing
+
   // Correlation ID middleware (must be first)
   app.use(correlationId);
 

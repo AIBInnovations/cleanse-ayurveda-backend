@@ -10,6 +10,8 @@ export const SERVICE_ROUTES = {
   "/api/calculate": process.env.PRICING_SERVICE_URL || "http://localhost:3004",
   "/api/coupons": process.env.PRICING_SERVICE_URL || "http://localhost:3004",
   "/api/inventory": process.env.INVENTORY_SERVICE_URL || "http://localhost:3005",
+  "/api/cms": process.env.CMS_SERVICE_URL || "http://localhost:3006",
+  "/api/engagement": process.env.ENGAGEMENT_SERVICE_URL || "http://localhost:3007",
 };
 
 /**
@@ -32,6 +34,7 @@ export const PUBLIC_ROUTES = [
   "/api/auth/admin/password/request-reset",
   "/api/auth/admin/password/reset",
   "/api/auth/test/firebase-token",
+  "/api/auth/guest",
   "/api/catalog/products",
   "/api/catalog/categories",
   "/api/catalog/brands",
@@ -43,7 +46,30 @@ export const PUBLIC_ROUTES = [
   "/api/calculate/cart",
   "/api/calculate/tax",
   "/api/coupons/validate",
-  "/api/order/cart*",
+  "/api/cms/health",
+  "/api/cms/pages",
+  "/api/cms/blogs",
+  "/api/cms/banners",
+  "/api/cms/popups",
+  "/api/cms/navigation",
+  "/api/cms/faqs",
+  "/api/cms/testimonials",
+  "/api/cms/reels",
+  "/api/engagement/health",
+  "/api/engagement/products",
+  "/api/engagement/loyalty/tiers",
+  "/api/engagement/referrals/apply",
+  "/api/inventory/stock",
+  "/api/auth/addresses/validate-pincode",
+];
+
+/**
+ * Routes that require authentication OR guest session
+ * These routes will use optionalAuth - authenticate if token present
+ */
+export const OPTIONAL_AUTH_ROUTES = [
+  "/api/order/cart",
+  "/api/order/checkout",
 ];
 
 /**
@@ -57,6 +83,8 @@ export const ADMIN_ROUTES = [
   "/api/coupons/admin",
   "/api/calculate/admin",
   "/api/auth/admin",
+  "/api/cms/admin",
+  "/api/engagement/admin",
 ];
 
 /**
@@ -94,4 +122,5 @@ export const HEALTH_CHECK_CONFIG = {
   TIMEOUT_MS: 5000, // 5 second timeout
   UNHEALTHY_THRESHOLD: 3, // Mark unhealthy after 3 failures
 };
+
 

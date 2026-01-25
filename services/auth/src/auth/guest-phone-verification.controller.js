@@ -1,6 +1,6 @@
 import { sendResponse } from "@shared/utils";
-import { HTTP_STATUS } from "../utils/constants.js";
-import Session from "../models/session.model.js";
+import { HTTP_STATUS } from "../../utils/constants.js";
+import Session from "../../models/session.model.js";
 
 /**
  * Send OTP to guest's phone for verification

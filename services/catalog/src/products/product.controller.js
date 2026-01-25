@@ -6,6 +6,8 @@ import ProductCategory from "../../models/product-category.model.js";
 import RelatedProduct from "../../models/related-product.model.js";
 import Category from "../../models/category.model.js";
 import Brand from "../../models/brand.model.js";
+import Bundle from "../../models/bundle.model.js";
+import BundleItem from "../../models/bundle-item.model.js";
 import { sendResponse } from "@shared/utils";
 import { generateSlug, generateUniqueSlug } from "../../services/slug.service.js";
 import { parsePagination, buildPaginationMeta } from "../../services/pagination.service.js";
@@ -254,7 +256,7 @@ export const getProductBySlug = async (req, res) => {
       return sendResponse(res, 404, "Product not found", null, `Product with slug '${slug}' not found`);
     }
 
-    const [primaryMedia, defaultVariant, categories] = await Promise.all([
+    const [primaryMedia, defaultVariant, categories, bundleItems] = await Promise.all([
       ProductMedia.findOne({
         product: product._id,
         isPrimary: true,
@@ -274,7 +276,29 @@ export const getProductBySlug = async (req, res) => {
         .populate("category", "name slug")
         .select("category isPrimary")
         .lean(),
+      BundleItem.find({ product: product._id })
+        .select("bundle")
+        .lean(),
     ]);
+
+    // Fetch active bundles if product is in any bundles
+    let bundles = [];
+    if (bundleItems.length > 0) {
+      const now = new Date();
+      const bundleIds = bundleItems.map((item) => item.bundle);
+
+      bundles = await Bundle.find({
+        _id: { $in: bundleIds },
+        isActive: true,
+        deletedAt: null,
+        $or: [{ validFrom: null }, { validFrom: { $lte: now } }],
+      })
+        .where({
+          $or: [{ validTo: null }, { validTo: { $gte: now } }],
+        })
+        .select("name slug description image originalPrice finalPrice savings validTo")
+        .lean();
+    }
 
     const enrichedProduct = {
       ...product,
@@ -290,9 +314,10 @@ export const getProductBySlug = async (req, res) => {
         ...pc.category,
         isPrimary: pc.isPrimary,
       })),
+      bundles,
     };
 
-    console.log(`> Product found: ${product.name}`);
+    console.log(`> Product found: ${product.name}, bundles: ${bundles.length}`);
     return sendResponse(res, 200, "Product fetched successfully", { product: enrichedProduct }, null);
   } catch (error) {
     console.log("> Error fetching product:", error.message);
