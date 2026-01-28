@@ -59,13 +59,11 @@ router.post(
 /**
  * @route POST /api/addresses/validate-pincode
  * @description Validate pincode and get city/state info
- * @access Private (consumer authenticated)
+ * @access Public (no authentication required for checking delivery availability)
  * @note This route must come before /:addressId to avoid matching "validate-pincode" as addressId
  */
 router.post(
   "/validate-pincode",
-  authenticateUser,
-  verifyActiveSession,
   validate(validatePincodeSchema),
   validatePincode,
 );

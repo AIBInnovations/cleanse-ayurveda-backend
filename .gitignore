@@ -6,6 +6,10 @@ pnpm-lock.yaml
 .env
 .env.local
 
+.md
+*.md
+.claude
+
 # Secrets
 secrets/
 secretes

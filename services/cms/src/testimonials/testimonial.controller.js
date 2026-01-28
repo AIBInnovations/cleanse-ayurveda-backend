@@ -59,7 +59,6 @@ const listAllTestimonials = async (req, res) => {
 
   const [testimonials, total] = await Promise.all([
     Testimonial.find(query)
-      .populate("created_by_id", "firstName lastName")
       .sort({ sort_order: 1, created_at: -1 })
       .skip(skip)
       .limit(limit)
@@ -82,9 +81,7 @@ const listAllTestimonials = async (req, res) => {
 const getTestimonialById = async (req, res) => {
   console.log("getTestimonialById called with id:", req.params.id);
 
-  const testimonial = await Testimonial.findById(req.params.id)
-    .populate("created_by_id", "firstName lastName")
-    .lean();
+  const testimonial = await Testimonial.findById(req.params.id).lean();
 
   if (!testimonial) {
     return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Testimonial not found");

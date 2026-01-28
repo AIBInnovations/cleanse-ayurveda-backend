@@ -1,0 +1,38 @@
+{
+  "name": "Test Homepage Layout",
+  "sections": [
+    {
+      "section_source": "custom_section",
+      "reference_model": "HomepageSection",
+      "reference_id": "6977361dcb6806be99cc6ec4",
+      "sort_order": 1,
+      "is_visible": true
+    },
+    {
+      "section_source": "custom_section",
+      "reference_model": "HomepageSection",
+      "reference_id": "697735dfcb6806be99cc6ebf",
+      "sort_order": 2,
+      "is_visible": true
+    },
+    {
+      "section_source": "custom_section",
+      "reference_model": "HomepageSection",
+      "reference_id": "697735ffcb6806be99cc6ec2",
+      "sort_order": 3,
+      "is_visible": true
+    },
+    {
+      "section_source": "featured_products",
+      "config": {
+        "product_source": "featured",
+        "limit": 8,
+        "heading": "Featured Products",
+        "layout_style": "grid"
+      },
+      "sort_order": 4,
+      "is_visible": true
+    }
+  ],
+  "is_active": true
+}

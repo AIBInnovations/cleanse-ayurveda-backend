@@ -1054,6 +1054,64 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+/**
+ * @route GET /api/users/by-firebase-uid/:firebaseUid
+ * @description Get user by Firebase UID (internal use by gateway)
+ * @access Internal
+ *
+ * @responseBody Success (200)
+ * {
+ *   "message": "User retrieved successfully",
+ *   "data": {
+ *     "_id": "...",
+ *     "firebaseUid": "...",
+ *     "phone": "+919876543210",
+ *     "type": "consumer",
+ *     "status": "active"
+ *   }
+ * }
+ */
+export const getUserByFirebaseUid = async (req, res) => {
+  try {
+    const { firebaseUid } = req.params;
+
+    console.log(`> Fetching user by Firebase UID: ${firebaseUid}`);
+
+    const user = await User.findOne({ firebaseUid })
+      .select("_id firebaseUid phone email firstName lastName status type")
+      .lean();
+
+    if (!user) {
+      console.log(`> User not found for Firebase UID: ${firebaseUid}`);
+      return sendResponse(
+        res,
+        HTTP_STATUS.NOT_FOUND,
+        "User not found",
+        null,
+        "No user found with this Firebase UID"
+      );
+    }
+
+    console.log(`> User found: ${user._id}`);
+
+    return sendResponse(
+      res,
+      HTTP_STATUS.OK,
+      "User retrieved successfully",
+      user
+    );
+  } catch (error) {
+    console.log(`> Error fetching user by Firebase UID: ${error.message}`);
+    return sendResponse(
+      res,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      "Error retrieving user",
+      null,
+      error.message
+    );
+  }
+};
+
 export default {
   register,
   loginWithOTP,
@@ -1062,4 +1120,5 @@ export default {
   refreshToken,
   requestPasswordReset,
   resetPassword,
+  getUserByFirebaseUid,
 };

@@ -1,0 +1,28 @@
+{
+  "name": "Brand Values",
+  "section_type": "features_grid",
+  "heading": "Why Choose Us",
+  "subheading": "Experience the difference",
+  "features": [
+    {
+      "icon_url": "https://example.com/icons/shipping.png",
+      "heading": "Express Shipping",
+      "description": "Fast delivery to your doorstep"
+    },
+    {
+      "icon_url": "https://example.com/icons/cruelty-free.png",
+      "heading": "Cruelty Free",
+      "description": "No animal testing"
+    },
+    {
+      "icon_url": "https://example.com/icons/ayurvedic.png",
+      "heading": "100% Ayurvedic",
+      "description": "Pure natural ingredients"
+    },
+    {
+      "icon_url": "https://example.com/icons/made-in-india.png",
+      "heading": "Made In India",
+      "description": "Proudly manufactured in India"
+    }
+  ]
+}

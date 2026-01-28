@@ -1,0 +1,26 @@
+{
+  "name": "Summer Bento",
+  "section_type": "bento_layout",
+  "heading": "Why Your Skin Deserves Best",
+  "bento_items": {
+    "images": [
+      {
+        "url": "https://example.com/images/bento-1.jpg",
+        "alt_text": "Natural skincare",
+        "link_url": "/products/summer-collection"
+      },
+      {
+        "url": "https://example.com/images/bento-2.jpg",
+        "alt_text": "Organic ingredients",
+        "link_url": "/about"
+      }
+    ],
+    "text_overlays": [
+      {
+        "heading": "50% OFF",
+        "body": "Summer Sale",
+        "position": "top_right"
+      }
+    ]
+  }
+}

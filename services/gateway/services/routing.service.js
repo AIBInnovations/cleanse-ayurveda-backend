@@ -1,121 +1,124 @@
-import { createProxyMiddleware } from "http-proxy-middleware";
+import httpProxy from "http-proxy";
 import { SERVICE_ROUTES, HTTP_STATUS } from "../utils/constants.js";
 import healthCheckService from "./health-check.service.js";
 import { sendResponse } from "@shared/utils";
 
+// Proxy instance cache (one per unique target URL)
+const proxyInstances = new Map();
+
 /**
- * Create proxy middleware for a service
+ * Get or create proxy instance for target URL
  */
-const createServiceProxy = (targetUrl, servicePath) => {
-  return createProxyMiddleware({
-    target: targetUrl,
-    changeOrigin: true,
-    pathRewrite: (path) => {
-      // Express strips the mount path (e.g., /api/catalog) before calling this
-      // So /api/catalog/products becomes /products
-      // We need to add /api back since all backend services expect /api/* paths
-      return "/api" + path;
-    },
-    onProxyReq: (proxyReq, req) => {
-      // Enhanced debug logging
-      console.log("DEBUG onProxyReq:", {
-        method: req.method,
-        path: req.path,
-        userId: req.userId,
-        guestId: req.guestId,
-        userType: req.userType,
-        hasBody: !!req.body,
-        hasAuthHeader: !!req.headers.authorization,
-        hasAccessToken: !!req.accessToken,
-        headers: {
-          'x-user-id': req.userId,
-          'x-guest-id': req.guestId,
-          'x-user-type': req.userType,
-          'authorization': req.accessToken ? `Bearer ${req.accessToken.substring(0, 20)}...` : null
-        }
-      });
+const getOrCreateProxy = (targetUrl) => {
+  if (!proxyInstances.has(targetUrl)) {
+    const proxy = httpProxy.createProxyServer({
+      target: targetUrl,
+      changeOrigin: true,
+      timeout: 30000, // 30 second timeout
+    });
 
-      // Forward correlation ID
-      if (req.correlationId) {
-        proxyReq.setHeader("x-correlation-id", req.correlationId);
-      }
+    setupProxyEvents(proxy, targetUrl);
+    proxyInstances.set(targetUrl, proxy);
 
-      // Forward user context
-      if (req.userId) {
-        proxyReq.setHeader("x-user-id", req.userId);
-      }
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "PROXY_CREATED",
+      target: targetUrl,
+    }));
+  }
 
-      // Forward guest context
-      if (req.guestId) {
-        proxyReq.setHeader("x-guest-id", req.guestId);
-      }
+  return proxyInstances.get(targetUrl);
+};
 
-      // Forward user type
-      if (req.userType) {
-        proxyReq.setHeader("x-user-type", req.userType);
-      }
+/**
+ * Setup event handlers for proxy instance
+ */
+const setupProxyEvents = (proxy, targetUrl) => {
+  // Handle outgoing request to backend
+  proxy.on("proxyReq", (proxyReq, req, res) => {
+    // Enhanced debug logging
+    console.log("DEBUG onProxyReq:", {
+      method: req.method,
+      path: req.path,
+      userId: req.userId,
+      guestId: req.guestId,
+      userType: req.userType,
+      hasAuthHeader: !!req.headers.authorization,
+      hasAccessToken: !!req.accessToken,
+    });
 
-      // Forward session ID if available
-      if (req.sessionId) {
-        proxyReq.setHeader("x-session-id", req.sessionId);
-      }
+    // Forward correlation ID
+    if (req.correlationId) {
+      proxyReq.setHeader("x-correlation-id", req.correlationId);
+    }
 
-      // Forward Authorization header for services that validate JWT directly
-      // Some services use @shared/auth-middleware which expects the Authorization header
-      if (req.accessToken) {
-        proxyReq.setHeader("Authorization", `Bearer ${req.accessToken}`);
-      } else if (req.headers.authorization) {
-        // Fallback to original header if accessToken not set (e.g., for public routes)
-        proxyReq.setHeader("Authorization", req.headers.authorization);
-      }
+    // Forward user context
+    if (req.userId) {
+      proxyReq.setHeader("x-user-id", req.userId);
+    }
 
-      // Note: No body reconstruction needed since gateway doesn't parse request bodies
-      // The proxy middleware transparently forwards the raw request body to backend services
+    if (req.guestId) {
+      proxyReq.setHeader("x-guest-id", req.guestId);
+    }
 
-      // Log proxied request
-      console.log(
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          correlationId: req.correlationId,
-          event: "PROXY_REQUEST",
-          method: req.method,
-          path: req.path,
-          target: targetUrl,
-          headers: {
-            userId: req.userId || null,
-            guestId: req.guestId || null,
-            userType: req.userType || null,
-          },
-        })
-      );
-    },
-    onProxyRes: (proxyRes, req) => {
-      // Log proxied response
-      console.log(
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          correlationId: req.correlationId,
-          event: "PROXY_RESPONSE",
-          method: req.method,
-          path: req.path,
-          statusCode: proxyRes.statusCode,
-          target: targetUrl,
-        })
-      );
-    },
-    onError: (err, req, res) => {
-      console.log(
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          correlationId: req.correlationId,
-          event: "PROXY_ERROR",
-          method: req.method,
-          path: req.path,
-          target: targetUrl,
-          error: err.message,
-        })
-      );
+    if (req.userType) {
+      proxyReq.setHeader("x-user-type", req.userType);
+    }
 
+    if (req.sessionId) {
+      proxyReq.setHeader("x-session-id", req.sessionId);
+    }
+
+    // Forward Authorization header
+    if (req.accessToken) {
+      proxyReq.setHeader("Authorization", `Bearer ${req.accessToken}`);
+    } else if (req.headers.authorization) {
+      proxyReq.setHeader("Authorization", req.headers.authorization);
+    }
+
+    // Log proxied request
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      correlationId: req.correlationId,
+      event: "PROXY_REQUEST",
+      method: req.method,
+      path: req.path,
+      target: targetUrl,
+      headers: {
+        userId: req.userId || null,
+        guestId: req.guestId || null,
+        userType: req.userType || null,
+      },
+    }));
+  });
+
+  // Handle response from backend
+  proxy.on("proxyRes", (proxyRes, req, res) => {
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      correlationId: req.correlationId,
+      event: "PROXY_RESPONSE",
+      method: req.method,
+      path: req.path,
+      statusCode: proxyRes.statusCode,
+      target: targetUrl,
+    }));
+  });
+
+  // Handle proxy errors
+  proxy.on("error", (err, req, res) => {
+    console.log(JSON.stringify({
+      timestamp: new Date().toISOString(),
+      correlationId: req.correlationId,
+      event: "PROXY_ERROR",
+      method: req.method,
+      path: req.path,
+      target: targetUrl,
+      error: err.message,
+    }));
+
+    // Only send response if headers haven't been sent
+    if (!res.headersSent) {
       return sendResponse(
         res,
         HTTP_STATUS.BAD_GATEWAY,
@@ -123,8 +126,35 @@ const createServiceProxy = (targetUrl, servicePath) => {
         null,
         "Unable to reach backend service"
       );
-    },
+    }
   });
+};
+
+/**
+ * Create proxy middleware for a service
+ */
+const createServiceProxy = (targetUrl, servicePath) => {
+  const proxy = getOrCreateProxy(targetUrl);
+
+  // Return Express middleware function
+  return (req, res, next) => {
+    // Path rewriting: Express strips mount path, we add /api back
+    // Example: /api/catalog/products → /products → /api/products
+    req.url = "/api" + req.url;
+
+    console.log("DEBUG proxy.web:", {
+      method: req.method,
+      rewrittenUrl: req.url,
+      servicePath,
+      targetUrl,
+    });
+
+    // Proxy the request
+    proxy.web(req, res, {}, (err) => {
+      // Error is handled by 'error' event listener
+      // Don't call next(err) to avoid double error handling
+    });
+  };
 };
 
 /**
@@ -134,14 +164,12 @@ const createServiceProxy = (targetUrl, servicePath) => {
 const checkServiceHealth = (servicePath) => {
   return (req, res, next) => {
     if (!healthCheckService.isServiceHealthy(servicePath)) {
-      console.log(
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          correlationId: req.correlationId,
-          event: "SERVICE_UNAVAILABLE",
-          service: servicePath,
-        })
-      );
+      console.log(JSON.stringify({
+        timestamp: new Date().toISOString(),
+        correlationId: req.correlationId,
+        event: "SERVICE_UNAVAILABLE",
+        service: servicePath,
+      }));
 
       return sendResponse(
         res,
@@ -169,11 +197,33 @@ export const setupRoutes = (app) => {
     );
   });
 
-  console.log(
-    JSON.stringify({
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    event: "ROUTES_CONFIGURED",
+    routes: Object.keys(SERVICE_ROUTES),
+    uniqueTargets: [...new Set(Object.values(SERVICE_ROUTES))].length,
+    totalRoutes: Object.keys(SERVICE_ROUTES).length,
+  }));
+};
+
+/**
+ * Close all proxy instances (for graceful shutdown)
+ */
+export const closeAllProxies = () => {
+  proxyInstances.forEach((proxy, targetUrl) => {
+    console.log(JSON.stringify({
       timestamp: new Date().toISOString(),
-      event: "ROUTES_CONFIGURED",
-      routes: Object.keys(SERVICE_ROUTES),
-    })
-  );
+      event: "PROXY_CLOSING",
+      target: targetUrl,
+    }));
+
+    proxy.close();
+  });
+
+  proxyInstances.clear();
+
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    event: "ALL_PROXIES_CLOSED",
+  }));
 };

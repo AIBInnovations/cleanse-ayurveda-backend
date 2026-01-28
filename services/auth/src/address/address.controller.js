@@ -523,7 +523,7 @@ export const setDefaultBilling = async (req, res) => {
 /**
  * @route POST /api/addresses/validate-pincode
  * @description Validate pincode and get city/state info
- * @access Private (consumer authenticated)
+ * @access Public (no authentication required)
  *
  * @requestBody
  * { "pincode": "400001" }
@@ -543,7 +543,6 @@ export const setDefaultBilling = async (req, res) => {
  */
 export const validatePincode = async (req, res) => {
   console.log("> Validate pincode request received");
-  console.log("> User ID:", req.userId?.toString());
   console.log("> Pincode:", req.body.pincode);
 
   try {

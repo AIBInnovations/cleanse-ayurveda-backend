@@ -15,12 +15,14 @@
     "express": "^4.21.2",
     "cors": "^2.8.5",
     "jsonwebtoken": "^9.0.3",
-    "http-proxy-middleware": "^3.0.3",
+    "http-proxy": "^1.18.1",
     "express-rate-limit": "^7.5.0",
     "uuid": "^11.0.5",
     "axios": "^1.7.9",
     "@shared/env-loader": "workspace:*",
-    "@shared/utils": "workspace:*"
+    "@shared/utils": "workspace:*",
+    "@shared/http-client": "workspace:*",
+    "@shared/config": "workspace:*"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

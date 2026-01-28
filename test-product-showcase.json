@@ -1,0 +1,12 @@
+{
+  "name": "Hero Product",
+  "section_type": "product_showcase",
+  "showcase_product": {
+    "product_id": "507f1f77bcf86cd799439011",
+    "image_url": "https://example.com/images/hero-product.jpg",
+    "heading": "Our Bestselling Face Cream",
+    "description": "Transform your skin with our award-winning formula",
+    "cta_text": "Shop Now",
+    "layout": "image_left"
+  }
+}
