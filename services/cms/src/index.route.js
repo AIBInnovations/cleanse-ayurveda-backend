@@ -11,6 +11,9 @@ import faqRoutes from "./faqs/faq.route.js";
 import mediaRoutes from "./media/media.route.js";
 import testimonialRoutes from "./testimonials/testimonial.route.js";
 import reelRoutes from "./reels/reel.route.js";
+import homepageSectionRoutes from "./homepage-sections/homepage-section.route.js";
+import homepageLayoutRoutes from "./homepage-layout/homepage-layout.route.js";
+import newsletterRoutes from "./newsletters/newsletter-subscriber.route.js";
 
 const consumerRouter = express.Router();
 const adminRouter = express.Router();
@@ -46,6 +49,15 @@ consumerRouter.use("/testimonials", testimonialRoutes.consumer);
 // Reels - /reels
 consumerRouter.use("/reels", reelRoutes.consumer);
 
+// Homepage Sections - /homepage-sections
+consumerRouter.use("/homepage-sections", homepageSectionRoutes.consumer);
+
+// Homepage Layout - /homepage-layout
+consumerRouter.use("/homepage-layout", homepageLayoutRoutes.consumer);
+
+// Newsletters - /newsletters
+consumerRouter.use("/newsletters", newsletterRoutes.consumer);
+
 // ============================================================
 // ADMIN ROUTES (Protected)
 // ============================================================
@@ -79,6 +91,15 @@ adminRouter.use("/testimonials", testimonialRoutes.admin);
 
 // Reels - /admin/reels
 adminRouter.use("/reels", reelRoutes.admin);
+
+// Homepage Sections - /admin/homepage-sections
+adminRouter.use("/homepage-sections", homepageSectionRoutes.admin);
+
+// Homepage Layout - /admin/homepage-layout
+adminRouter.use("/homepage-layout", homepageLayoutRoutes.admin);
+
+// Newsletters - /admin/newsletters
+adminRouter.use("/newsletters", newsletterRoutes.admin);
 
 export default {
   consumer: consumerRouter,

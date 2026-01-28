@@ -4,8 +4,8 @@
   "description": "Engagement Service - Reviews, Wishlists, Loyalty, Referrals, Store Credits, Notifications",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node init && node index.js",
+    "dev": "node init && nodemon index.js"
   },
   "keywords": [],
   "author": "",

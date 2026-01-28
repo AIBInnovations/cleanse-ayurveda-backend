@@ -7,6 +7,7 @@ import {
   refreshToken,
   requestPasswordReset,
   resetPassword,
+  getUserByFirebaseUid,
 } from "./user.controller.js";
 import {
   registerSchema,
@@ -70,5 +71,12 @@ router.post("/password/request-reset", validate(requestPasswordResetSchema), req
  * @access Public
  */
 router.post("/password/reset", validate(resetPasswordSchema), resetPassword);
+
+/**
+ * @route GET /api/users/by-firebase-uid/:firebaseUid
+ * @description Get user by Firebase UID (internal gateway use)
+ * @access Internal
+ */
+router.get("/users/by-firebase-uid/:firebaseUid", getUserByFirebaseUid);
 
 export default router;

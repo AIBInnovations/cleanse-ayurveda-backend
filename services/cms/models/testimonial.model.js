@@ -38,6 +38,16 @@ const testimonialSchema = new mongoose.Schema(
       ref: "Product",
       default: null,
     },
+    product_slug: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    product_name: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     is_verified_purchase: {
       type: Boolean,
       default: false,
@@ -45,12 +55,10 @@ const testimonialSchema = new mongoose.Schema(
     is_featured: {
       type: Boolean,
       default: false,
-      index: true,
     },
     is_active: {
       type: Boolean,
       default: true,
-      index: true,
     },
     sort_order: {
       type: Number,
@@ -58,7 +66,6 @@ const testimonialSchema = new mongoose.Schema(
     },
     created_by_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
       default: null,
     },
   },

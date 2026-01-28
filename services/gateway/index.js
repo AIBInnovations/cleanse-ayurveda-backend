@@ -1,6 +1,7 @@
 import "@shared/env-loader";
 import createApp from "./config/express.config.js";
 import healthCheckService from "./services/health-check.service.js";
+import { closeAllProxies } from "./services/routing.service.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,6 +22,9 @@ const gracefulShutdown = (signal) => {
 
   // Stop health check service
   healthCheckService.stopPeriodicChecks();
+
+  // Close all proxy instances
+  closeAllProxies();
 
   if (server) {
     server.close(() => {

@@ -128,20 +128,17 @@ cartSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 cartSchema.index({ createdAt: 1 });
 
 // Pre-validate hook to ensure either userId or sessionId exists
-cartSchema.pre("validate", function (next) {
+cartSchema.pre("validate", function () {
   if (!this.userId && !this.sessionId) {
-    next(new Error("Cart must have either userId or sessionId"));
-  } else {
-    next();
+    throw new Error("Cart must have either userId or sessionId");
   }
 });
 
 // Pre-save hook to increment version on modification (for optimistic locking)
-cartSchema.pre("save", function (next) {
+cartSchema.pre("save", function () {
   if (!this.isNew && this.isModified()) {
     this.version = (this.version || 0) + 1;
   }
-  next();
 });
 
 // Virtual for items

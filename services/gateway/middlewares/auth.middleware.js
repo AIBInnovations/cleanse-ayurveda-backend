@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import { sendResponse } from "@shared/utils";
+import { firebaseAdmin } from "@shared/config";
 import { HTTP_STATUS, PUBLIC_ROUTES, ADMIN_ROUTES, OPTIONAL_AUTH_ROUTES } from "../utils/constants.js";
 
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || "http://localhost:3001";
@@ -27,6 +28,18 @@ const verifyToken = (token) => {
       throw new Error("JWT_ACCESS_SECRET not configured");
     }
     return jwt.verify(token, secret);
+  } catch (error) {
+    return null;
+  }
+};
+
+/**
+ * Verify Firebase ID token
+ */
+const verifyFirebaseToken = async (token) => {
+  try {
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+    return decodedToken;
   } catch (error) {
     return null;
   }
@@ -268,6 +281,7 @@ export const gatewayAuth = async (req, res, next) => {
  * Optional authentication middleware
  * Tries to authenticate but doesn't fail if no token present
  * Useful for endpoints that work for both authenticated and anonymous users
+ * Supports both JWT tokens and Firebase tokens
  */
 export const optionalAuth = async (req, res, next) => {
   // Allow health check endpoint
@@ -287,11 +301,72 @@ export const optionalAuth = async (req, res, next) => {
     return next();
   }
 
-  // Verify token
-  const decoded = verifyToken(token);
+  // Try to verify as JWT token first
+  let decoded = verifyToken(token);
 
-  // If token invalid, continue without authentication
+  // If JWT verification failed, try Firebase token
   if (!decoded) {
+    const firebaseDecoded = await verifyFirebaseToken(token);
+
+    if (firebaseDecoded) {
+      // Firebase token is valid - fetch user from Auth service
+      try {
+        const userResponse = await axios.get(
+          `${AUTH_SERVICE_URL}/api/users/by-firebase-uid/${firebaseDecoded.uid}`,
+          {
+            timeout: 3000
+          }
+        );
+
+        const userData = userResponse.data?.data;
+
+        if (userData && userData._id) {
+          // User found - set authentication context
+          req.userId = userData._id;
+          req.userType = userData.type || "consumer";
+          req.guestId = null;
+          req.accessToken = token;
+
+          console.log(
+            JSON.stringify({
+              timestamp: new Date().toISOString(),
+              correlationId: req.correlationId,
+              event: "OPTIONAL_AUTH_SUCCESS_FIREBASE",
+              userId: req.userId,
+              userType: req.userType,
+              firebaseUid: firebaseDecoded.uid,
+              path: req.path,
+            })
+          );
+
+          return next();
+        } else {
+          // User not found in database
+          console.log(
+            JSON.stringify({
+              timestamp: new Date().toISOString(),
+              correlationId: req.correlationId,
+              event: "OPTIONAL_AUTH_USER_NOT_FOUND",
+              firebaseUid: firebaseDecoded.uid,
+              path: req.path,
+            })
+          );
+        }
+      } catch (error) {
+        console.log(
+          JSON.stringify({
+            timestamp: new Date().toISOString(),
+            correlationId: req.correlationId,
+            event: "OPTIONAL_AUTH_USER_FETCH_ERROR",
+            error: error.message,
+            firebaseUid: firebaseDecoded.uid,
+            path: req.path,
+          })
+        );
+      }
+    }
+
+    // Firebase token invalid or user not found - continue without auth
     console.log(
       JSON.stringify({
         timestamp: new Date().toISOString(),
@@ -309,6 +384,7 @@ export const optionalAuth = async (req, res, next) => {
     return next();
   }
 
+  // JWT token is valid - use decoded data
   // For optional auth, skip session validation and use JWT data directly
   // Session validation is optional - we trust the JWT signature
   console.log(

@@ -8,3 +8,5 @@ export { default as Faq } from "./faq.model.js";
 export { default as Media } from "./media.model.js";
 export { default as Testimonial } from "./testimonial.model.js";
 export { default as Reel } from "./reel.model.js";
+export { default as HomepageSection } from "./homepage-section.model.js";
+export { default as HomepageLayout } from "./homepage-layout.model.js";

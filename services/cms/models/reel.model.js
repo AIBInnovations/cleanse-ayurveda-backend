@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
 
+// Sub-schema for product references in reels
+const reelProductSchema = new mongoose.Schema(
+  {
+    product_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    product_slug: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    product_name: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+  },
+  { _id: false }
+);
+
 const reelSchema = new mongoose.Schema(
   {
     title: {
@@ -26,10 +48,13 @@ const reelSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    products: {
+      type: [reelProductSchema],
+      default: [],
+    },
     is_active: {
       type: Boolean,
       default: true,
-      index: true,
     },
     sort_order: {
       type: Number,
@@ -41,7 +66,6 @@ const reelSchema = new mongoose.Schema(
     },
     created_by_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
       default: null,
     },
   },

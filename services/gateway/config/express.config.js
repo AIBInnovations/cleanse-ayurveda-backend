@@ -7,6 +7,7 @@ import { setupRoutes } from "../services/routing.service.js";
 import healthCheckService from "../services/health-check.service.js";
 import { sendResponse } from "@shared/utils";
 import { HTTP_STATUS } from "../utils/constants.js";
+import homepageRoutes from "../routes/homepage.route.js";
 
 /**
  * Create and configure Express app
@@ -56,7 +57,10 @@ const createApp = () => {
     });
   });
 
-  // Authentication middleware (after health checks)
+  // Homepage aggregation route (public endpoint - before auth middleware)
+  app.use("/api/homepage", express.json(), homepageRoutes);
+
+  // Authentication middleware (after health checks and public routes)
   app.use(gatewayAuth);
 
   // Setup service routes

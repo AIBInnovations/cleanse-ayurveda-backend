@@ -60,7 +60,6 @@ const listAllReels = async (req, res) => {
 
   const [reels, total] = await Promise.all([
     Reel.find(query)
-      .populate("created_by_id", "firstName lastName")
       .sort({ sort_order: 1, created_at: -1 })
       .skip(skip)
       .limit(limit)
@@ -83,9 +82,7 @@ const listAllReels = async (req, res) => {
 const getReelById = async (req, res) => {
   console.log("getReelById called with id:", req.params.id);
 
-  const reel = await Reel.findById(req.params.id)
-    .populate("created_by_id", "firstName lastName")
-    .lean();
+  const reel = await Reel.findById(req.params.id).lean();
 
   if (!reel) {
     return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Reel not found");

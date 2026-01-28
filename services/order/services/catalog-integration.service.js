@@ -35,6 +35,32 @@ export const getVariant = async (variantId) => {
 };
 
 /**
+ * Get product variant details (validates both product and variant exist)
+ * @param {string} productId - Product ID
+ * @param {string} variantId - Variant ID
+ * @returns {Promise<Object>} Product variant details
+ */
+export const getProductVariant = async (productId, variantId) => {
+  try {
+    // Get product to validate it exists
+    const productResponse = await catalogClient.get(`/api/products/${productId}`);
+
+    // Get variant details
+    const variantResponse = await catalogClient.get(`/api/variants/${variantId}`);
+
+    return {
+      success: true,
+      data: {
+        product: productResponse.data,
+        variant: variantResponse.data
+      }
+    };
+  } catch (error) {
+    return handleServiceError(error, "Catalog");
+  }
+};
+
+/**
  * Get multiple variants by IDs
  * @param {Array} variantIds - Array of variant IDs
  * @returns {Promise<Object>} Bulk variant details

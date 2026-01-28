@@ -54,7 +54,7 @@ const bannerSchema = new mongoose.Schema(
     },
     created_by_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Admin",
+      default: null,
     },
   },
   {
